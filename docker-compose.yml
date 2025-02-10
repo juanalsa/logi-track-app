@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql_logistics
+    ports:
+      - "3308:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: challenge2025
+      MYSQL_DATABASE: logistics_db
+      MYSQL_USER: demo_mvp
+      MYSQL_PASSWORD: demo2025
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./mysql-init-scripts:/docker-entrypoint-initdb.d
+    restart: unless-stopped
+
+  redis:
+    image: redis:latest
+    container_name: redis_logistics
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: ["redis-server", "--appendonly", "yes"] 
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
+  redis_data:
