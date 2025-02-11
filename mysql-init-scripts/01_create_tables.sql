@@ -2,110 +2,110 @@ CREATE DATABASE IF NOT EXISTS logistics_db;
 USE logistics_db;
 
 -- Tabla de Ciudades
-CREATE TABLE Ciudad (
+CREATE TABLE city (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(100) NOT NULL UNIQUE,
-    departamento VARCHAR(100) NOT NULL,
-    pais VARCHAR(100) NOT NULL,
-    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    name VARCHAR(100) NOT NULL,
+    department VARCHAR(100) NOT NULL,
+    country VARCHAR(100) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Tabla de Contactos
-CREATE TABLE Contacto (
+-- Tabla de Info de contacto
+CREATE TABLE contact (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(100) NOT NULL,
-    telefono VARCHAR(20) NOT NULL,
-    direccion VARCHAR(255) NOT NULL,
-    correo VARCHAR(100) UNIQUE,
-    ciudad_id INT NOT NULL,
-    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (ciudad_id) REFERENCES Ciudad(id)
+    name VARCHAR(100) NOT NULL,
+    phone VARCHAR(20) NOT NULL,
+    address VARCHAR(255) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    city_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (city_id) REFERENCES city(id)
 );
 
 -- Tabla de Usuarios
-CREATE TABLE Usuario (
+CREATE TABLE user (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    correo VARCHAR(100) NOT NULL UNIQUE,
-    contraseña VARCHAR(255) NOT NULL,
-    rol ENUM('admin', 'user') NOT NULL,
-    estado BOOLEAN DEFAULT 1,
-    contacto_id INT UNIQUE,
-    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (contacto_id) REFERENCES Contacto(id)
+    email VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    role ENUM('admin', 'user') NOT NULL,
+    is_active BOOLEAN DEFAULT 1,
+    contact_id INT UNIQUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (contact_id) REFERENCES contact(id)
 );
 
 -- Tabla de Estados de Orden de Envío
-CREATE TABLE EstadoOrden (
+CREATE TABLE order_status (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(50) NOT NULL UNIQUE,
-    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    name VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Tabla de Tipos de Producto
-CREATE TABLE TipoProducto (
+CREATE TABLE product_type (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(100) NOT NULL UNIQUE,
-    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    name VARCHAR(100) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Tabla de Transportistas
-CREATE TABLE Transportista (
+CREATE TABLE carrier (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(100) NOT NULL,
-    tipo_vehiculo VARCHAR(50) NOT NULL,
-    capacidad_maxima DECIMAL(10,2) NOT NULL,
-    disponibilidad BOOLEAN DEFAULT 1,
-    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    name VARCHAR(100) NOT NULL,
+    vehicle_type VARCHAR(50) NOT NULL,
+    max_capacity DECIMAL(10,2) NOT NULL,
+    availability BOOLEAN NOT NULL DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Tabla de Rutas
-CREATE TABLE Ruta (
+CREATE TABLE route (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(100) NOT NULL,
-    distancia_km DECIMAL(10,2) NOT NULL,
-    tiempo_estimado TIME NOT NULL,
-    ciudad_origen_id INT NOT NULL,
-    ciudad_destino_id INT NOT NULL,
-    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (ciudad_origen_id) REFERENCES Ciudad(id),
-    FOREIGN KEY (ciudad_destino_id) REFERENCES Ciudad(id)
+    name VARCHAR(255) NOT NULL,
+    distance_km DECIMAL(10,2) NOT NULL,
+    estimated_time TIME NOT NULL,
+    origin_city_id INT NOT NULL,
+    destination_city_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (origin_city_id) REFERENCES city(id),
+    FOREIGN KEY (destination_city_id) REFERENCES city(id)
 );
 
 -- Tabla de Órdenes de Envío
-CREATE TABLE OrdenEnvio (
+CREATE TABLE shipment_order (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    usuario_id INT NOT NULL,
-    remitente_id INT NOT NULL,
-    destinatario_id INT NOT NULL,
-    peso DECIMAL(10,2) NOT NULL,
-    dimensiones VARCHAR(100) NOT NULL,
-    tipo_producto_id INT NOT NULL,
-    descripcion TEXT,
-    valor_declarado DECIMAL(10,2),
-    valor_flete DECIMAL(10,2),
-    estado_id INT NOT NULL,
-    transportista_id INT,
-    ruta_id INT,
-    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (usuario_id) REFERENCES Usuario(id),
-    FOREIGN KEY (remitente_id) REFERENCES Contacto(id),
-    FOREIGN KEY (destinatario_id) REFERENCES Contacto(id),
-    FOREIGN KEY (tipo_producto_id) REFERENCES TipoProducto(id),
-    FOREIGN KEY (estado_id) REFERENCES EstadoOrden(id),
-    FOREIGN KEY (transportista_id) REFERENCES Transportista(id),
-    FOREIGN KEY (ruta_id) REFERENCES Ruta(id)
+    user_id INT NOT NULL,
+    sender_contact_id INT NOT NULL,
+    recipient_contact_id INT NOT NULL,
+    weight DECIMAL(10,2) NOT NULL,
+    dimensions VARCHAR(100) NOT NULL,
+    product_type_id INT NOT NULL,
+    description TEXT,
+    declared_value DECIMAL(10,2),
+    shipping_cost DECIMAL(10,2),
+    order_status_id INT NOT NULL,
+    carrier_id INT,
+    route_id INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES user(id),
+    FOREIGN KEY (sender_contact_id) REFERENCES contact(id),
+    FOREIGN KEY (recipient_contact_id) REFERENCES contact(id),
+    FOREIGN KEY (product_type_id) REFERENCES product_type(id),
+    FOREIGN KEY (order_status_id) REFERENCES order_status(id),
+    FOREIGN KEY (carrier_id) REFERENCES carrier(id),
+    FOREIGN KEY (route_id) REFERENCES route(id)
 );
 
 -- Tabla de Seguimiento de Órdenes
-CREATE TABLE SeguimientoOrden (
+CREATE TABLE shipment_tracking (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    orden_envio_id INT NOT NULL,
-    estado_id INT NOT NULL,
-    descripcion TEXT,
-    ciudad_id INT NOT NULL,
-    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (orden_envio_id) REFERENCES OrdenEnvio(id),
-    FOREIGN KEY (estado_id) REFERENCES EstadoOrden(id),
-    FOREIGN KEY (ciudad_id) REFERENCES Ciudad(id)
+    shipment_order_id INT NOT NULL,
+    order_status_id INT NOT NULL,
+    description TEXT NOT NULL,
+    current_city_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (shipment_order_id) REFERENCES shipment_order(id),
+    FOREIGN KEY (order_status_id) REFERENCES order_status(id),
+    FOREIGN KEY (current_city_id) REFERENCES city(id)
 );
