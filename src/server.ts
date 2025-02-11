@@ -1,4 +1,5 @@
 import express, { Router } from 'express';
+import { setupSwagger } from './config';
 
 interface Options {
   port?: number;
@@ -20,6 +21,9 @@ export class Server {
     // Middlewares
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
+
+    // Configurar Swagger
+    setupSwagger(this.app);
 
     // Usar rutas definidas
     this.app.use(this.routes);
