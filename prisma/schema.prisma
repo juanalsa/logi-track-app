@@ -1,0 +1,144 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model carrier {
+  id             Int              @id @default(autoincrement())
+  name           String           @db.VarChar(100)
+  vehicle_type   String           @db.VarChar(50)
+  max_capacity   Decimal          @db.Decimal(10, 2)
+  availability   Boolean          @default(true)
+  created_at     DateTime?        @default(now()) @db.Timestamp(0)
+  shipment_order shipment_order[]
+}
+
+model city {
+  id                                    Int                 @id @default(autoincrement())
+  name                                  String              @db.VarChar(100)
+  department                            String              @db.VarChar(100)
+  country                               String              @db.VarChar(100)
+  created_at                            DateTime?           @default(now()) @db.Timestamp(0)
+  contact                               contact[]
+  route_route_origin_city_idTocity      route[]             @relation("route_origin_city_idTocity")
+  route_route_destination_city_idTocity route[]             @relation("route_destination_city_idTocity")
+  shipment_tracking                     shipment_tracking[]
+}
+
+model contact {
+  id                                                          Int              @id @default(autoincrement())
+  name                                                        String           @db.VarChar(100)
+  phone                                                       String           @db.VarChar(20)
+  address                                                     String           @db.VarChar(255)
+  email                                                       String           @unique(map: "email") @db.VarChar(100)
+  city_id                                                     Int
+  created_at                                                  DateTime?        @default(now()) @db.Timestamp(0)
+  city                                                        city             @relation(fields: [city_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "contact_ibfk_1")
+  shipment_order_shipment_order_sender_contact_idTocontact    shipment_order[] @relation("shipment_order_sender_contact_idTocontact")
+  shipment_order_shipment_order_recipient_contact_idTocontact shipment_order[] @relation("shipment_order_recipient_contact_idTocontact")
+  user                                                        user?
+
+  @@index([city_id], map: "city_id")
+}
+
+model order_status {
+  id                Int                 @id @default(autoincrement())
+  name              String              @db.VarChar(50)
+  created_at        DateTime?           @default(now()) @db.Timestamp(0)
+  shipment_order    shipment_order[]
+  shipment_tracking shipment_tracking[]
+}
+
+model product_type {
+  id             Int              @id @default(autoincrement())
+  name           String           @db.VarChar(100)
+  created_at     DateTime?        @default(now()) @db.Timestamp(0)
+  shipment_order shipment_order[]
+}
+
+model route {
+  id                                   Int              @id @default(autoincrement())
+  name                                 String           @db.VarChar(255)
+  distance_km                          Decimal          @db.Decimal(10, 2)
+  estimated_time                       DateTime         @db.Time(0)
+  origin_city_id                       Int
+  destination_city_id                  Int
+  created_at                           DateTime?        @default(now()) @db.Timestamp(0)
+  city_route_origin_city_idTocity      city             @relation("route_origin_city_idTocity", fields: [origin_city_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "route_ibfk_1")
+  city_route_destination_city_idTocity city             @relation("route_destination_city_idTocity", fields: [destination_city_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "route_ibfk_2")
+  shipment_order                       shipment_order[]
+
+  @@index([destination_city_id], map: "destination_city_id")
+  @@index([origin_city_id], map: "origin_city_id")
+}
+
+model shipment_order {
+  id                                                   Int                 @id @default(autoincrement())
+  user_id                                              Int
+  sender_contact_id                                    Int
+  recipient_contact_id                                 Int
+  weight                                               Decimal             @db.Decimal(10, 2)
+  dimensions                                           String              @db.VarChar(100)
+  product_type_id                                      Int
+  description                                          String?             @db.Text
+  declared_value                                       Decimal?            @db.Decimal(10, 2)
+  shipping_cost                                        Decimal?            @db.Decimal(10, 2)
+  order_status_id                                      Int
+  carrier_id                                           Int?
+  route_id                                             Int?
+  created_at                                           DateTime?           @default(now()) @db.Timestamp(0)
+  updated_at                                           DateTime?           @default(now()) @db.Timestamp(0)
+  user                                                 user                @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "shipment_order_ibfk_1")
+  contact_shipment_order_sender_contact_idTocontact    contact             @relation("shipment_order_sender_contact_idTocontact", fields: [sender_contact_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "shipment_order_ibfk_2")
+  contact_shipment_order_recipient_contact_idTocontact contact             @relation("shipment_order_recipient_contact_idTocontact", fields: [recipient_contact_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "shipment_order_ibfk_3")
+  product_type                                         product_type        @relation(fields: [product_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "shipment_order_ibfk_4")
+  order_status                                         order_status        @relation(fields: [order_status_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "shipment_order_ibfk_5")
+  carrier                                              carrier?            @relation(fields: [carrier_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "shipment_order_ibfk_6")
+  route                                                route?              @relation(fields: [route_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "shipment_order_ibfk_7")
+  shipment_tracking                                    shipment_tracking[]
+
+  @@index([carrier_id], map: "carrier_id")
+  @@index([order_status_id], map: "order_status_id")
+  @@index([product_type_id], map: "product_type_id")
+  @@index([recipient_contact_id], map: "recipient_contact_id")
+  @@index([route_id], map: "route_id")
+  @@index([sender_contact_id], map: "sender_contact_id")
+  @@index([user_id], map: "user_id")
+}
+
+model shipment_tracking {
+  id                Int            @id @default(autoincrement())
+  shipment_order_id Int
+  order_status_id   Int
+  description       String         @db.Text
+  current_city_id   Int
+  created_at        DateTime?      @default(now()) @db.Timestamp(0)
+  shipment_order    shipment_order @relation(fields: [shipment_order_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "shipment_tracking_ibfk_1")
+  order_status      order_status   @relation(fields: [order_status_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "shipment_tracking_ibfk_2")
+  city              city           @relation(fields: [current_city_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "shipment_tracking_ibfk_3")
+
+  @@index([current_city_id], map: "current_city_id")
+  @@index([order_status_id], map: "order_status_id")
+  @@index([shipment_order_id], map: "shipment_order_id")
+}
+
+model user {
+  id             Int              @id @default(autoincrement())
+  email          String           @unique(map: "email") @db.VarChar(100)
+  password       String           @db.VarChar(255)
+  role           user_role
+  is_active      Boolean?         @default(true)
+  contact_id     Int?             @unique(map: "contact_id")
+  created_at     DateTime?        @default(now()) @db.Timestamp(0)
+  shipment_order shipment_order[]
+  contact        contact?         @relation(fields: [contact_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_ibfk_1")
+}
+
+enum user_role {
+  admin
+  user
+}
