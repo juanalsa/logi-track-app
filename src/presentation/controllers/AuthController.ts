@@ -1,12 +1,22 @@
 import { Request, Response } from 'express';
-import { CustomError, RegisterUserDto } from '../../domain';
-import { IAuthRepository } from '../../application';
+import { CustomError, LoginUserDto, RegisterUserDto } from '../../domain';
+import { IAuthRepository, LoginUser, RegisterUser } from '../../application';
 
 export class AuthController {
   constructor(private readonly authRepository: IAuthRepository) {}
 
   loginUser = (req: Request, res: Response) => {
-    res.json('Login User Controller');
+    const [error, loginUserDto] = LoginUserDto.create(req.body);
+
+    if (error) {
+      res.status(400).json({ error });
+      return;
+    }
+
+    new LoginUser(this.authRepository)
+      .execute(loginUserDto!)
+      .then((data) => res.json(data))
+      .catch((error) => this.handleError(error, res));
   };
 
   registerUser = (req: Request, res: Response) => {
@@ -17,9 +27,9 @@ export class AuthController {
       return;
     }
 
-    this.authRepository
-      .register(registerUserDto!)
-      .then((user) => res.json({ user }))
+    new RegisterUser(this.authRepository)
+      .execute(registerUserDto!)
+      .then((data) => res.json(data))
       .catch((error) => this.handleError(error, res));
   };
 
