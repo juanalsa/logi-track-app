@@ -25,11 +25,11 @@ export class MySQLDatasourceImpl implements IAuthDatasource {
       // 1. Verificar si el correo existe
       const user = await prisma.user.findUnique({ where: { email } });
 
-      if (!user) throw CustomError.badRequest('User not found');
+      if (!user) throw CustomError.notFound('User not found');
 
       // 2. Verificar si la contraseña es correcta
       if (!this.comparePassword(password, user.password))
-        throw CustomError.badRequest('User not found');
+        throw CustomError.notFound('User not found');
 
       // 3. Retornar el usuario
       return UserMapper.userEntityFromObject(user);
@@ -61,7 +61,7 @@ export class MySQLDatasourceImpl implements IAuthDatasource {
         },
       });
 
-      if (!contact) throw CustomError.badRequest('Error creating contact');
+      if (!contact) throw CustomError.internalServer('Error creating contact');
 
       // Guardar info usuario
       const user = await prisma.user.create({
