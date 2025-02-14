@@ -1,11 +1,11 @@
--- Insertando datos en la tabla EstadoOrden
-INSERT INTO EstadoOrden (nombre, fecha_creacion) VALUES
+-- Inserts Estado Orden
+INSERT INTO order_status (name, created_at) VALUES
 ('En espera', NOW()),
 ('En transito', NOW()),
 ('Entregado', NOW());
 
--- Insertando datos en la tabla TipoProducto
-INSERT INTO TipoProducto (nombre, fecha_creacion) VALUES
+-- Inserts Tipo Producto
+INSERT INTO product_type (name, created_at) VALUES
 ('Electronica', NOW()),
 ('Ropa', NOW()),
 ('Documentos', NOW()),
@@ -15,8 +15,8 @@ INSERT INTO TipoProducto (nombre, fecha_creacion) VALUES
 ('Hogar', NOW()),
 ('Herramientas', NOW());
 
--- Insertando datos en la tabla Ciudad
-INSERT INTO Ciudad (nombre, departamento, pais, fecha_creacion) VALUES
+-- Inserts Ciudad
+INSERT INTO city (name, department, country, created_at) VALUES
 ('Bogota', 'Cundinamarca', 'Colombia', NOW()),
 ('Medellin', 'Antioquia', 'Colombia', NOW()),
 ('Cali', 'Valle del Cauca', 'Colombia', NOW()),
@@ -24,8 +24,8 @@ INSERT INTO Ciudad (nombre, departamento, pais, fecha_creacion) VALUES
 ('Cartagena', 'Bolivar', 'Colombia', NOW()),
 ('Bucaramanga', 'Santander', 'Colombia', NOW());
 
--- Insertando datos en la tabla Ruta
-INSERT INTO Ruta (nombre, distancia_km, tiempo_estimado, ciudad_origen_id, ciudad_destino_id, fecha_creacion) VALUES
+-- Inserts Ruta
+INSERT INTO route (name, distance_km, estimated_time, origin_city_id, destination_city_id, created_at) VALUES
 ('Cali -> Bogota', 500.00, '10:00:00', 3, 1, NOW()),
 ('Medellin -> Barranquilla', 700.00, '12:00:00', 2, 4, NOW()),
 ('Cartagena -> Bucaramanga', 600.00, '11:00:00', 5, 6, NOW()),
@@ -33,8 +33,8 @@ INSERT INTO Ruta (nombre, distancia_km, tiempo_estimado, ciudad_origen_id, ciuda
 ('Barranquilla -> Medellin', 700.00, '12:00:00', 4, 2, NOW()),
 ('Bucaramanga -> Cartagena', 600.00, '11:00:00', 6, 5, NOW());
 
--- Insertando datos en la tabla Transportista
-INSERT INTO Transportista (nombre, tipo_vehiculo, capacidad_maxima, disponibilidad, fecha_creacion) VALUES
+-- Inserts Transportista
+INSERT INTO carrier (name, vehicle_type, max_capacity, availability, created_at) VALUES
 ('Juan Perez', 'Moto', 20.00, 1, NOW()),
 ('Carlos Gomez', 'Furgon', 500.00, 1, NOW()),
 ('Luis Rodriguez', 'Camion pequeno', 1000.00, 1, NOW()),
