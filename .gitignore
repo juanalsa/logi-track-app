@@ -4,3 +4,4 @@ dist/
 .DS_Store
 mysql_data/
 redis_data/
+src/__tests__/coverage/

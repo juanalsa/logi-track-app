@@ -29,13 +29,13 @@ export class RegisterUserDto {
       return ['email is required'];
     }
 
-    if (!Validators.email.test(email)) return ['Invalid email'];
+    if (!Validators.email.test(email)) return ['email is invalid'];
 
     if (!password) {
       return ['password is required'];
     }
 
-    if (password.length < 6) return ['Password too short'];
+    if (password.length < 6) return ['password too short'];
 
     if (!cityId) {
       return ['cityId is required'];
