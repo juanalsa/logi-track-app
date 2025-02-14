@@ -1,14 +1,13 @@
 {
   "preset": "ts-jest",
   "testEnvironment": "node",
-  "roots": ["<rootDir>/src"],
-  "transform": {
-    "^.+\\.tsx?$": "ts-jest"
-  },
+  "testMatch": ["**/__tests__/**/*.test.ts"],
   "moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json", "node"],
+  "clearMocks": true,
   "collectCoverage": true,
-  "collectCoverageFrom": ["src/**/*.{ts,tsx}", "!src/**/*.d.ts"],
-  "coverageDirectory": "coverage",
-  "testMatch": ["**/__tests__/**/*.test.(ts|tsx)"],
-  "setupFilesAfterEnv": ["<rootDir>/jest.setup.ts"]
+  "coverageDirectory": "src/__tests__/coverage",
+  "coverageProvider": "v8",
+  "bail": 1,
+  "verbose": true,
+  "setupFilesAfterEnv": ["<rootDir>/src/__tests__/setEnvVars.ts"]
 }
